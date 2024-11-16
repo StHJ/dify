@@ -169,14 +169,14 @@ class InsureMoLargeLanguageModel(LargeLanguageModel):
         :param user: unique user id
         :return: full response or stream response chunk generator result
         """
-        headers = {"Content-Type": "application/json"}
+        headers = {"Content-Type": "application/json","Authorization":"Bearer MOATzqYEsxsgAUTxFkkL0zhzT3OMfU0e"}
 
         endpoint_url = credentials["base_url"]
         if not endpoint_url.endswith("/"):
             endpoint_url += "/"
 
         # prepare the payload for a simple ping to the model
-        data = {"model": model, "stream": stream}
+        data = {"model": model, "stream": stream,"message":"[]","query":"hi"}
 
         if "format" in model_parameters:
             data["format"] = model_parameters["format"]
@@ -276,7 +276,7 @@ class InsureMoLargeLanguageModel(LargeLanguageModel):
 
         # transform response
         result = LLMResult(
-            model=response_json["model"],
+            model="InsureMo",
             prompt_messages=prompt_messages,
             message=assistant_message,
             usage=usage,
@@ -331,7 +331,16 @@ class InsureMoLargeLanguageModel(LargeLanguageModel):
                 continue
 
             try:
-                chunk_json = json.loads(chunk)
+                json_string = re.search(r'data: ({.*})', chunk)
+
+                if "DONE" in chunk:
+                    chunk_json = ""
+                else:
+                    if json_string:
+                        chunk_json = json.loads(json_string.group(1))
+                    else:
+                        chunk_json = None
+
                 # stream ended
             except json.JSONDecodeError as e:
                 yield create_final_llm_result_chunk(
@@ -347,10 +356,10 @@ class InsureMoLargeLanguageModel(LargeLanguageModel):
                 if not chunk_json:
                     continue
 
-                if "message" not in chunk_json:
+                if "choices" not in chunk_json:
                     text = ""
                 else:
-                    text = chunk_json.get("message").get("content", "")
+                    text = chunk_json.get("choices")[0].get("delta").get("content")
             else:
                 if not chunk_json:
                     continue
@@ -362,7 +371,7 @@ class InsureMoLargeLanguageModel(LargeLanguageModel):
 
             full_text += text
 
-            if chunk_json["done"]:
+            if "DONE" in chunk_json:
                 # calculate num tokens
                 if "prompt_eval_count" in chunk_json:
                     prompt_tokens = chunk_json["prompt_eval_count"]
