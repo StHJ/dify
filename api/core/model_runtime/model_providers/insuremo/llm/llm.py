@@ -52,21 +52,21 @@ from core.model_runtime.model_providers.__base.large_language_model import (
 logger = logging.getLogger(__name__)
 
 
-class OllamaLargeLanguageModel(LargeLanguageModel):
+class InsureMoLargeLanguageModel(LargeLanguageModel):
     """
-    Model class for Ollama large language model.
+    Model class for InsureMo large language model.
     """
 
     def _invoke(
-            self,
-            model: str,
-            credentials: dict,
-            prompt_messages: list[PromptMessage],
-            model_parameters: dict,
-            tools: Optional[list[PromptMessageTool]] = None,
-            stop: Optional[list[str]] = None,
-            stream: bool = True,
-            user: Optional[str] = None,
+        self,
+        model: str,
+        credentials: dict,
+        prompt_messages: list[PromptMessage],
+        model_parameters: dict,
+        tools: Optional[list[PromptMessageTool]] = None,
+        stop: Optional[list[str]] = None,
+        stream: bool = True,
+        user: Optional[str] = None,
     ) -> Union[LLMResult, Generator]:
         """
         Invoke large language model
@@ -92,11 +92,11 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
         )
 
     def get_num_tokens(
-            self,
-            model: str,
-            credentials: dict,
-            prompt_messages: list[PromptMessage],
-            tools: Optional[list[PromptMessageTool]] = None,
+        self,
+        model: str,
+        credentials: dict,
+        prompt_messages: list[PromptMessage],
+        tools: Optional[list[PromptMessageTool]] = None,
     ) -> int:
         """
         Get number of tokens for given prompt messages
@@ -148,14 +148,14 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
             raise CredentialsValidateFailedError(f"An error occurred during credentials validation: {str(ex)}")
 
     def _generate(
-            self,
-            model: str,
-            credentials: dict,
-            prompt_messages: list[PromptMessage],
-            model_parameters: dict,
-            stop: Optional[list[str]] = None,
-            stream: bool = True,
-            user: Optional[str] = None,
+        self,
+        model: str,
+        credentials: dict,
+        prompt_messages: list[PromptMessage],
+        model_parameters: dict,
+        stop: Optional[list[str]] = None,
+        stream: bool = True,
+        user: Optional[str] = None,
     ) -> Union[LLMResult, Generator]:
         """
         Invoke llm completion model
@@ -169,7 +169,7 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
         :param user: unique user id
         :return: full response or stream response chunk generator result
         """
-        headers = {"Content-Type": "application/json","Authorization":"Bearer MOATzqYEsxsgAUTxFkkL0zhzT3OMfU0e"}
+        headers = {"Content-Type": "application/json"}
 
         endpoint_url = credentials["base_url"]
         if not endpoint_url.endswith("/"):
@@ -235,12 +235,12 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
         return self._handle_generate_response(model, credentials, completion_type, response, prompt_messages)
 
     def _handle_generate_response(
-            self,
-            model: str,
-            credentials: dict,
-            completion_type: LLMMode,
-            response: requests.Response,
-            prompt_messages: list[PromptMessage],
+        self,
+        model: str,
+        credentials: dict,
+        completion_type: LLMMode,
+        response: requests.Response,
+        prompt_messages: list[PromptMessage],
     ) -> LLMResult:
         """
         Handle llm completion response
@@ -285,12 +285,12 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
         return result
 
     def _handle_generate_stream_response(
-            self,
-            model: str,
-            credentials: dict,
-            completion_type: LLMMode,
-            response: requests.Response,
-            prompt_messages: list[PromptMessage],
+        self,
+        model: str,
+        credentials: dict,
+        completion_type: LLMMode,
+        response: requests.Response,
+        prompt_messages: list[PromptMessage],
     ) -> Generator:
         """
         Handle llm completion stream response
@@ -306,7 +306,7 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
         chunk_index = 0
 
         def create_final_llm_result_chunk(
-                index: int, message: AssistantPromptMessage, finish_reason: str
+            index: int, message: AssistantPromptMessage, finish_reason: str
         ) -> LLMResultChunk:
             # calculate num tokens
             prompt_tokens = self._get_num_tokens_by_gpt2(prompt_messages[0].content)
@@ -407,7 +407,7 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
 
     def _convert_prompt_message_to_dict(self, message: PromptMessage) -> dict:
         """
-        Convert PromptMessage to dict for Ollama API
+        Convert PromptMessage to dict for InsureMo API
         """
         if isinstance(message, UserPromptMessage):
             message = cast(UserPromptMessage, message)
@@ -483,8 +483,8 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                     type=ParameterType.FLOAT,
                     help=I18nObject(
                         en_US="The temperature of the model. "
-                              "Increasing the temperature will make the model answer "
-                              "more creatively. (Default: 0.8)",
+                        "Increasing the temperature will make the model answer "
+                        "more creatively. (Default: 0.8)",
                         zh_Hans="模型的温度。增加温度将使模型的回答更具创造性。（默认值：0.8）",
                     ),
                     default=0.1,
@@ -498,8 +498,8 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                     type=ParameterType.FLOAT,
                     help=I18nObject(
                         en_US="Works together with top-k. A higher value (e.g., 0.95) will lead to "
-                              "more diverse text, while a lower value (e.g., 0.5) will generate more "
-                              "focused and conservative text. (Default: 0.9)",
+                        "more diverse text, while a lower value (e.g., 0.5) will generate more "
+                        "focused and conservative text. (Default: 0.9)",
                         zh_Hans="与top-k一起工作。较高的值（例如，0.95）会导致生成更多样化的文本，而较低的值（例如，0.5）会生成更专注和保守的文本。（默认值：0.9）",
                     ),
                     default=0.9,
@@ -512,8 +512,8 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                     type=ParameterType.INT,
                     help=I18nObject(
                         en_US="Reduces the probability of generating nonsense. "
-                              "A higher value (e.g. 100) will give more diverse answers, "
-                              "while a lower value (e.g. 10) will be more conservative. (Default: 40)",
+                        "A higher value (e.g. 100) will give more diverse answers, "
+                        "while a lower value (e.g. 10) will be more conservative. (Default: 40)",
                         zh_Hans="减少生成无意义内容的可能性。较高的值（例如100）将提供更多样化的答案，而较低的值（例如10）将更为保守。（默认值：40）",
                     ),
                     min=1,
@@ -525,8 +525,8 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                     type=ParameterType.FLOAT,
                     help=I18nObject(
                         en_US="Sets how strongly to penalize repetitions. "
-                              "A higher value (e.g., 1.5) will penalize repetitions more strongly, "
-                              "while a lower value (e.g., 0.9) will be more lenient. (Default: 1.1)",
+                        "A higher value (e.g., 1.5) will penalize repetitions more strongly, "
+                        "while a lower value (e.g., 0.9) will be more lenient. (Default: 1.1)",
                         zh_Hans="设置对重复内容的惩罚强度。一个较高的值（例如，1.5）会更强地惩罚重复内容，而一个较低的值（例如，0.9）则会相对宽容。（默认值：1.1）",
                     ),
                     min=-2,
@@ -539,7 +539,7 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                     type=ParameterType.INT,
                     help=I18nObject(
                         en_US="Maximum number of tokens to predict when generating text. "
-                              "(Default: 128, -1 = infinite generation, -2 = fill context)",
+                        "(Default: 128, -1 = infinite generation, -2 = fill context)",
                         zh_Hans="生成文本时预测的最大令牌数。（默认值：128，-1 = 无限生成，-2 = 填充上下文）",
                     ),
                     default=(512 if int(credentials.get("max_tokens", 4096)) >= 768 else 128),
@@ -552,9 +552,9 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                     type=ParameterType.INT,
                     help=I18nObject(
                         en_US="Enable Mirostat sampling for controlling perplexity. "
-                              "(default: 0, 0 = disabled, 1 = Mirostat, 2 = Mirostat 2.0)",
+                        "(default: 0, 0 = disabled, 1 = Mirostat, 2 = Mirostat 2.0)",
                         zh_Hans="启用 Mirostat 采样以控制困惑度。"
-                                "（默认值：0，0 = 禁用，1 = Mirostat，2 = Mirostat 2.0）",
+                        "（默认值：0，0 = 禁用，1 = Mirostat，2 = Mirostat 2.0）",
                     ),
                     min=0,
                     max=2,
@@ -565,9 +565,9 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                     type=ParameterType.FLOAT,
                     help=I18nObject(
                         en_US="Influences how quickly the algorithm responds to feedback from "
-                              "the generated text. A lower learning rate will result in slower adjustments, "
-                              "while a higher learning rate will make the algorithm more responsive. "
-                              "(Default: 0.1)",
+                        "the generated text. A lower learning rate will result in slower adjustments, "
+                        "while a higher learning rate will make the algorithm more responsive. "
+                        "(Default: 0.1)",
                         zh_Hans="影响算法对生成文本反馈响应的速度。较低的学习率会导致调整速度变慢，而较高的学习率会使得算法更加灵敏。（默认值：0.1）",
                     ),
                     precision=1,
@@ -578,7 +578,7 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                     type=ParameterType.FLOAT,
                     help=I18nObject(
                         en_US="Controls the balance between coherence and diversity of the output. "
-                              "A lower value will result in more focused and coherent text. (Default: 5.0)",
+                        "A lower value will result in more focused and coherent text. (Default: 5.0)",
                         zh_Hans="控制输出的连贯性和多样性之间的平衡。较低的值会导致更专注和连贯的文本。（默认值：5.0）",
                     ),
                     precision=1,
@@ -600,11 +600,11 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                     type=ParameterType.INT,
                     help=I18nObject(
                         en_US="The number of layers to offload to the GPU(s). "
-                              "On macOS it defaults to 1 to enable metal support, 0 to disable."
-                              "As long as a model fits into one gpu it stays in one. "
-                              "It does not set the number of GPU(s). ",
+                        "On macOS it defaults to 1 to enable metal support, 0 to disable."
+                        "As long as a model fits into one gpu it stays in one. "
+                        "It does not set the number of GPU(s). ",
                         zh_Hans="加载到 GPU 的层数。在 macOS 上，默认为 1 以启用 Metal 支持，设置为 0 则禁用。"
-                                "只要模型适合一个 GPU，它就保留在其中。它不设置 GPU 的数量。",
+                        "只要模型适合一个 GPU，它就保留在其中。它不设置 GPU 的数量。",
                     ),
                     min=-1,
                     default=1,
@@ -615,10 +615,10 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                     type=ParameterType.INT,
                     help=I18nObject(
                         en_US="Sets the number of threads to use during computation. "
-                              "By default, Ollama will detect this for optimal performance. "
-                              "It is recommended to set this value to the number of physical CPU cores "
-                              "your system has (as opposed to the logical number of cores).",
-                        zh_Hans="设置计算过程中使用的线程数。默认情况下，Ollama会检测以获得最佳性能。建议将此值设置为系统拥有的物理CPU核心数（而不是逻辑核心数）。",
+                        "By default, InsureMo will detect this for optimal performance. "
+                        "It is recommended to set this value to the number of physical CPU cores "
+                        "your system has (as opposed to the logical number of cores).",
+                        zh_Hans="设置计算过程中使用的线程数。默认情况下，InsureMo会检测以获得最佳性能。建议将此值设置为系统拥有的物理CPU核心数（而不是逻辑核心数）。",
                     ),
                     min=1,
                 ),
@@ -628,7 +628,7 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                     type=ParameterType.INT,
                     help=I18nObject(
                         en_US="Sets how far back for the model to look back to prevent repetition. "
-                              "(Default: 64, 0 = disabled, -1 = num_ctx)",
+                        "(Default: 64, 0 = disabled, -1 = num_ctx)",
                         zh_Hans="设置模型回溯多远的内容以防止重复。（默认值：64，0 = 禁用，-1 = num_ctx）",
                     ),
                     min=-1,
@@ -639,8 +639,8 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                     type=ParameterType.FLOAT,
                     help=I18nObject(
                         en_US="Tail free sampling is used to reduce the impact of less probable tokens "
-                              "from the output. A higher value (e.g., 2.0) will reduce the impact more, "
-                              "while a value of 1.0 disables this setting. (default: 1)",
+                        "from the output. A higher value (e.g., 2.0) will reduce the impact more, "
+                        "while a value of 1.0 disables this setting. (default: 1)",
                         zh_Hans="用于减少输出中不太可能的标记的影响。较高的值（例如，2.0）会更多地减少这种影响，而1.0的值则会禁用此设置。（默认值：1）",
                     ),
                     precision=1,
@@ -651,8 +651,8 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                     type=ParameterType.INT,
                     help=I18nObject(
                         en_US="Sets the random number seed to use for generation. Setting this to "
-                              "a specific number will make the model generate the same text for "
-                              "the same prompt. (Default: 0)",
+                        "a specific number will make the model generate the same text for "
+                        "the same prompt. (Default: 0)",
                         zh_Hans="设置用于生成的随机数种子。将此设置为特定数字将使模型对相同的提示生成相同的文本。（默认值：0）",
                     ),
                 ),
@@ -662,14 +662,14 @@ class OllamaLargeLanguageModel(LargeLanguageModel):
                     type=ParameterType.STRING,
                     help=I18nObject(
                         en_US="Sets how long the model is kept in memory after generating a response. "
-                              "This must be a duration string with a unit (e.g., '10m' for 10 minutes or '24h' for 24 hours)."
-                              " A negative number keeps the model loaded indefinitely, and '0' unloads the model"
-                              " immediately after generating a response."
-                              " Valid time units are 's','m','h'. (Default: 5m)",
+                        "This must be a duration string with a unit (e.g., '10m' for 10 minutes or '24h' for 24 hours)."
+                        " A negative number keeps the model loaded indefinitely, and '0' unloads the model"
+                        " immediately after generating a response."
+                        " Valid time units are 's','m','h'. (Default: 5m)",
                         zh_Hans="设置模型在生成响应后在内存中保留的时间。"
-                                "这必须是一个带有单位的持续时间字符串（例如，'10m' 表示10分钟，'24h' 表示24小时）。"
-                                "负数表示无限期地保留模型，'0'表示在生成响应后立即卸载模型。"
-                                "有效的时间单位有 's'（秒）、'm'（分钟）、'h'（小时）。（默认值：5m）",
+                        "这必须是一个带有单位的持续时间字符串（例如，'10m' 表示10分钟，'24h' 表示24小时）。"
+                        "负数表示无限期地保留模型，'0'表示在生成响应后立即卸载模型。"
+                        "有效的时间单位有 's'（秒）、'm'（分钟）、'h'（小时）。（默认值：5m）",
                     ),
                 ),
                 ParameterRule(
