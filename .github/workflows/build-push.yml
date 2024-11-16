@@ -15,8 +15,8 @@ concurrency:
 env:
   DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
   DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-  DIFY_WEB_IMAGE_NAME: ${{ vars.DIFY_WEB_IMAGE_NAME || '562059487/dify-web' }}
-  DIFY_API_IMAGE_NAME: ${{ vars.DIFY_API_IMAGE_NAME || '562059487/dify-api' }}
+  DIFY_WEB_IMAGE_NAME: ${{ vars.DIFY_WEB_IMAGE_NAME || 'langgenius/dify-web' }}
+  DIFY_API_IMAGE_NAME: ${{ vars.DIFY_API_IMAGE_NAME || 'langgenius/dify-api' }}
 
 jobs:
   build:
@@ -95,7 +95,7 @@ jobs:
   create-manifest:
     needs: build
     runs-on: ubuntu-latest
-    if: github.repository == 'langgenius/dify'
+    if: github.repository == 'StHJ/dify'
     strategy:
       matrix:
         include:
